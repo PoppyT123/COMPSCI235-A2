@@ -106,7 +106,11 @@ def article_to_dict(article: Article):
         'hyperlink': article.hyperlink,
         'image_hyperlink': article.image_hyperlink,
         'comments': comments_to_dict(article.comments),
-        'tags': tags_to_dict(article.tags)
+        'tags': tags_to_dict(article.tags),
+        'director' : article.director,
+        'actors' : article.actors,
+        'runtime' : article.runtime,
+        'rating' : article.rating
     }
     return article_dict
 
@@ -149,3 +153,4 @@ def dict_to_article(dict):
     article = Article(dict.id, dict.date, dict.title, dict.first_para, dict.hyperlink)
     # Note there's no comments or tags.
     return article
+

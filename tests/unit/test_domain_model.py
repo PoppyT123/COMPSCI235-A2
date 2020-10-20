@@ -38,7 +38,7 @@ def test_user_construction(user):
 
 def test_article_construction(article):
     assert article.id is None
-    assert article.date == date.fromisoformat('2020-03-15')
+    assert article.date == 2020
     assert article.title == 'Coronavirus travel restrictions: Self-isolation deadline pushed back to give airlines breathing room'
     assert article.first_para == 'The self-isolation deadline has been pushed back'
     assert article.hyperlink == 'https://www.nzherald.co.nz/business/news/article.cfm?c_id=3&objectid=12316800'

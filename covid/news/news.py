@@ -35,7 +35,7 @@ def articles_by_date():
         target_date = first_article['date']
     else:
         # Convert target_date from string to date.
-        target_date = date.fromisoformat(target_date)
+        target_date = int(target_date)
 
     if article_to_show_comments is None:
         # No view-comments query parameter, so set to a non-existent article id.
@@ -57,13 +57,13 @@ def articles_by_date():
         # There's at least one article for the target date.
         if previous_date is not None:
             # There are articles on a previous date, so generate URLs for the 'previous' and 'first' navigation buttons.
-            prev_article_url = url_for('news_bp.articles_by_date', date=previous_date.isoformat())
-            first_article_url = url_for('news_bp.articles_by_date', date=first_article['date'].isoformat())
+            prev_article_url = url_for('news_bp.articles_by_date', date=previous_date)
+            first_article_url = url_for('news_bp.articles_by_date', date=first_article['date'])
 
         # There are articles on a subsequent date, so generate URLs for the 'next' and 'last' navigation buttons.
         if next_date is not None:
-            next_article_url = url_for('news_bp.articles_by_date', date=next_date.isoformat())
-            last_article_url = url_for('news_bp.articles_by_date', date=last_article['date'].isoformat())
+            next_article_url = url_for('news_bp.articles_by_date', date=next_date)
+            last_article_url = url_for('news_bp.articles_by_date', date=last_article['date'])
 
         # Construct urls for viewing article comments and adding comments.
         for article in articles:
@@ -73,8 +73,8 @@ def articles_by_date():
         # Generate the webpage to display the articles.
         return render_template(
             'news/articles.html',
-            title='Articles',
-            articles_title=target_date.strftime('%A %B %e %Y'),
+            title='Movies',
+            articles_title=tag_name + " Movies",
             articles=articles,
             selected_articles=utilities.get_selected_articles(len(articles) * 2),
             tag_urls=utilities.get_tags_and_urls(),
@@ -91,7 +91,7 @@ def articles_by_date():
 
 @news_blueprint.route('/articles_by_tag', methods=['GET'])
 def articles_by_tag():
-    articles_per_page = 3
+    articles_per_page = 10
 
     # Read query parameters.
     tag_name = request.args.get('tag')
@@ -145,8 +145,8 @@ def articles_by_tag():
     # Generate the webpage to display the articles.
     return render_template(
         'news/articles.html',
-        title='Articles',
-        articles_title='Articles tagged by ' + tag_name,
+        title='Movies',
+        articles_title=tag_name + ' Movies',
         articles=articles,
         selected_articles=utilities.get_selected_articles(len(articles) * 2),
         tag_urls=utilities.get_tags_and_urls(),
@@ -201,7 +201,7 @@ def comment_on_article():
     article = services.get_article(article_id, repo.repo_instance)
     return render_template(
         'news/comment_on_article.html',
-        title='Edit article',
+        title='Edit Movie Review',
         article=article,
         form=form,
         handler_url=url_for('news_bp.comment_on_article'),
@@ -222,9 +222,9 @@ class ProfanityFree:
 
 
 class CommentForm(FlaskForm):
-    comment = TextAreaField('Comment', [
+    comment = TextAreaField('Review', [
         DataRequired(),
-        Length(min=4, message='Your comment is too short'),
-        ProfanityFree(message='Your comment must not contain profanity')])
-    article_id = HiddenField("Article id")
+        Length(min=4, message='Your review is too short'),
+        ProfanityFree(message='Your review must not contain profanity')])
+    article_id = HiddenField("Movie id")
     submit = SubmitField('Submit')

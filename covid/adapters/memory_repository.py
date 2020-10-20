@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash
 
 from covid.adapters.repository import AbstractRepository, RepositoryException
 from covid.domain.model import Article, Tag, User, Comment, make_tag_association, make_comment
-
+from covid.domain import movie_file_csv_reader
 
 class MemoryRepository(AbstractRepository):
     # Articles ordered by date, not id. id is assumed unique.
@@ -41,13 +41,26 @@ class MemoryRepository(AbstractRepository):
 
         return article
 
-    def get_articles_by_date(self, target_date: date) -> List[Article]:
+    def sort_articles_by_rating(self, rating: int) -> List[Article]:
+        top_articles = list()
+        for article in self._articles:
+            if article.rating >= 8:
+                top_articles.append(article)
+        return top_articles
+
+    def get_articles_by_date(self, target_date: int) -> List[Article]:
         target_article = Article(
             date=target_date,
             title=None,
             first_para=None,
             hyperlink=None,
-            image_hyperlink=None
+            image_hyperlink=None,
+            id=None,
+            director=None,
+            actors=None,
+            runtime=None,
+            rating=None
+
         )
         matching_articles = list()
 
@@ -148,7 +161,7 @@ class MemoryRepository(AbstractRepository):
     # Helper method to return article index.
     def article_index(self, article: Article):
         index = bisect_left(self._articles, article)
-        if index != len(self._articles) and self._articles[index].date == article.date:
+        if index != len(self._articles) and self._articles[index].title == article.title:
             return index
         raise ValueError
 
@@ -170,28 +183,32 @@ def read_csv_file(filename: str):
 def load_articles_and_tags(data_path: str, repo: MemoryRepository):
     tags = dict()
 
-    for data_row in read_csv_file(os.path.join(data_path, 'news_articles.csv')):
+    for data_row in read_csv_file(os.path.join(data_path, 'Data1000Movies.csv')):
 
         article_key = int(data_row[0])
-        number_of_tags = len(data_row) - 6
-        article_tags = data_row[-number_of_tags:]
+        article_tags = data_row[2].split(",")
 
-        # Add any new tags; associate the current article with tags.
+
         for tag in article_tags:
             if tag not in tags.keys():
                 tags[tag] = list()
             tags[tag].append(article_key)
-        del data_row[-number_of_tags:]
+
 
         # Create Article object.
         article = Article(
-            date=date.fromisoformat(data_row[1]),
-            title=data_row[2],
+            date=int(data_row[6]),
+            title=data_row[1],
             first_para=data_row[3],
-            hyperlink=data_row[4],
-            image_hyperlink=data_row[5],
-            id=article_key
+            hyperlink="https://source.unsplash.com/random",
+            image_hyperlink="https://source.unsplash.com/random/200x100",
+            id=article_key,
+            director=data_row[4],
+            actors=data_row[5].split(","),
+            runtime=int(data_row[7]),
+            rating=float(data_row[8])
         )
+
 
         # Add the Article to the repository.
         repo.add_article(article)

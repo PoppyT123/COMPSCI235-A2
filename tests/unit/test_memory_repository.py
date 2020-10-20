@@ -33,16 +33,16 @@ def test_repository_can_retrieve_article_count(in_memory_repo):
 
 def test_repository_can_add_article(in_memory_repo):
     article = Article(
-        date.fromisoformat('2020-03-09'),
-        'Second US coronavirus cruise tests negative amid delays and cancellations',
-        'It was revealed ...',
-        'https://www.nzherald.co.nz/travel/news/article.cfm?c_id=7&objectid=12315024',
-        'https://www.nzherald.co.nz/resizer/ix7hy3lzkMWUkD8hE6kdZ-8oaOM=/620x349/smart/filters:quality(70)/arc-anglerfish-syd-prod-nzme.s3.amazonaws.com/public/7VFOBLCBCNDHLICBY3CTPFR2L4.jpg',
-        7
+        '2014',
+        'Guardians of the Galaxy',
+        'A group of intergalactic criminals are forced to work together to stop a fanatical warrior from taking control of the universe.',
+        'https://source.unsplash.com/random',
+        'https://source.unsplash.com/random/200x100',
+        1
     )
     in_memory_repo.add_article(article)
 
-    assert in_memory_repo.get_article(7) is article
+    assert in_memory_repo.get_article(1) is article
 
 
 def test_repository_can_retrieve_article(in_memory_repo):

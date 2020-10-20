@@ -2,8 +2,8 @@ import abc
 from typing import List
 from datetime import date
 
-from covid.domain.model import User, Article, Tag, Comment
 
+from covid.domain.model import Article, Tag, User, Comment, make_tag_association, make_comment
 
 repo_instance = None
 
@@ -45,9 +45,9 @@ class AbstractRepository(abc.ABC):
     @abc.abstractmethod
     def get_articles_by_date(self, target_date: date) -> List[Article]:
         """ Returns a list of Articles that were published on target_date.
-
-        If there are no Articles on the given date, this method returns an empty list.
-        """
+    #
+    #     If there are no Articles on the given date, this method returns an empty list.
+    #     """
         raise NotImplementedError
 
     @abc.abstractmethod

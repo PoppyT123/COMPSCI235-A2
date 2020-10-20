@@ -41,6 +41,14 @@
         </a>
         <h2>{{article.title}}</h2>
         <p>{{article.first_para}}</p>
+        <p>Rating: {{article.rating}}</p>
+        <p>Runtime: {{article.runtime}} minutes</p>
+        <div style="float:left">
+            {% for actor in article.actors %}
+            <p> {{ actor }} </p>
+            {% endfor %}
+        </div>
+        <p>Director: {{article.director}}</p>
         <div style="float:left">
             {% for tag in article.tags %}
             <button class="btn-general" onclick="location.href='{{ tag_urls[tag.name] }}'">{{ tag.name }}</button>
