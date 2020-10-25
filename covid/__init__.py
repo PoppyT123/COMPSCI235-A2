@@ -42,4 +42,7 @@ def create_app(test_config=None):
         from .utilities import utilities
         app.register_blueprint(utilities.utilities_blueprint)
 
+        from .news import browse
+        app.register_blueprint(browse.browse_blueprint)
+
     return app

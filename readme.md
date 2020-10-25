@@ -1,4 +1,4 @@
-# COVID-19 Web Application
+# 235 FLIX Web Application
 
 ## Description
 
@@ -49,7 +49,7 @@ E.g.
 
 assigns TEST_DATA_PATH with the following value (the use of os.path.join and os.sep ensures use of the correct platform path separator):
 
-`C:\Users\ian\Documents\python-dev\COVID-19\tests\data`
+`C:\Users\PoppyTodd\new-covid\COMPSCI-235\tests\data`
 
 You can then run tests from within PyCharm.
 

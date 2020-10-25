@@ -3,7 +3,7 @@ from typing import List
 from datetime import date
 
 
-from covid.domain.model import Article, Tag, User, Comment, make_tag_association, make_comment
+from covid.domain.model import Movie, Tag, User, Comment, make_tag_association, make_comment
 
 repo_instance = None
 
@@ -30,12 +30,12 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def add_article(self, article: Article):
+    def add_article(self, article: Movie):
         """ Adds an Article to the repository. """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_article(self, id: int) -> Article:
+    def get_article(self, id: int) -> Movie:
         """ Returns Article with id from the repository.
 
         If there is no Article with the given id, this method returns None.
@@ -43,12 +43,21 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_articles_by_date(self, target_date: date) -> List[Article]:
+    def get_articles_by_date(self, target_date: int) -> List[Movie]:
         """ Returns a list of Articles that were published on target_date.
     #
     #     If there are no Articles on the given date, this method returns an empty list.
     #     """
         raise NotImplementedError
+    @abc.abstractmethod
+    def get_articles_by_title(self, target_title: str) -> List[Movie]:
+
+        raise NotImplementedError
+
+    # @abc.abstractmethod
+    # def get_articles_by_director(self, target_director: str) -> List[Movie]:
+    #
+    #     raise NotImplementedError
 
     @abc.abstractmethod
     def get_number_of_articles(self):
@@ -56,7 +65,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_first_article(self) -> Article:
+    def get_first_article(self) -> Movie:
         """ Returns the first Article, ordered by date, from the repository.
 
         Returns None if the repository is empty.
@@ -64,7 +73,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_last_article(self) -> Article:
+    def get_last_article(self) -> Movie:
         """ Returns the last Article, ordered by date, from the repository.
 
         Returns None if the repository is empty.
@@ -88,7 +97,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_date_of_previous_article(self, article: Article):
+    def get_date_of_previous_article(self, article: Movie):
         """ Returns the date of an Article that immediately precedes article.
 
         If article is the first Article in the repository, this method returns None because there are no Articles
@@ -97,7 +106,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_date_of_next_article(self, article: Article):
+    def get_date_of_next_article(self, article: Movie):
         """ Returns the date of an Article that immediately follows article.
 
         If article is the last Article in the repository, this method returns None because there are no Articles

@@ -8,7 +8,7 @@ from bisect import bisect, bisect_left, insort_left
 from werkzeug.security import generate_password_hash
 
 from covid.adapters.repository import AbstractRepository, RepositoryException
-from covid.domain.model import Article, Tag, User, Comment, make_tag_association, make_comment
+from covid.domain.model import Movie, Tag, User, Comment, make_tag_association, make_comment
 from covid.domain import movie_file_csv_reader
 
 class MemoryRepository(AbstractRepository):
@@ -27,11 +27,11 @@ class MemoryRepository(AbstractRepository):
     def get_user(self, username) -> User:
         return next((user for user in self._users if user.username == username), None)
 
-    def add_article(self, article: Article):
+    def add_article(self, article: Movie):
         insort_left(self._articles, article)
         self._articles_index[article.id] = article
 
-    def get_article(self, id: int) -> Article:
+    def get_article(self, id: int) -> Movie:
         article = None
 
         try:
@@ -41,15 +41,9 @@ class MemoryRepository(AbstractRepository):
 
         return article
 
-    def sort_articles_by_rating(self, rating: int) -> List[Article]:
-        top_articles = list()
-        for article in self._articles:
-            if article.rating >= 8:
-                top_articles.append(article)
-        return top_articles
 
-    def get_articles_by_date(self, target_date: int) -> List[Article]:
-        target_article = Article(
+    def get_articles_by_date(self, target_date: int) -> List[Movie]:
+        target_article = Movie(
             date=target_date,
             title=None,
             first_para=None,
@@ -76,6 +70,22 @@ class MemoryRepository(AbstractRepository):
             pass
 
         return matching_articles
+
+    def get_articles_by_title(self, target_title: str) -> List[Movie]:
+        movie_list = list()
+        for article in self._articles:
+            if target_title.lower() in article.title.lower() or target_title.lower() == article.title.lower():
+                movie_list.append(article)
+        return movie_list
+
+
+    # def get_articles_by_director(self, target_director: str) -> List[Movie]:
+    #     movie_list = list()
+    #     for article in self._articles:
+    #         if target_director.lower() in article.director.lower() or target_director.lower() == article.director.lower():
+    #             movie_list.append(article)
+    #     return movie_list
+
 
     def get_number_of_articles(self):
         return len(self._articles)
@@ -115,7 +125,7 @@ class MemoryRepository(AbstractRepository):
 
         return article_ids
 
-    def get_date_of_previous_article(self, article: Article):
+    def get_date_of_previous_article(self, article: Movie):
         previous_date = None
 
         try:
@@ -130,7 +140,7 @@ class MemoryRepository(AbstractRepository):
 
         return previous_date
 
-    def get_date_of_next_article(self, article: Article):
+    def get_date_of_next_article(self, article: Movie):
         next_date = None
 
         try:
@@ -159,7 +169,7 @@ class MemoryRepository(AbstractRepository):
         return self._comments
 
     # Helper method to return article index.
-    def article_index(self, article: Article):
+    def article_index(self, article: Movie):
         index = bisect_left(self._articles, article)
         if index != len(self._articles) and self._articles[index].title == article.title:
             return index
@@ -182,7 +192,6 @@ def read_csv_file(filename: str):
 
 def load_articles_and_tags(data_path: str, repo: MemoryRepository):
     tags = dict()
-
     for data_row in read_csv_file(os.path.join(data_path, 'Data1000Movies.csv')):
 
         article_key = int(data_row[0])
@@ -196,11 +205,11 @@ def load_articles_and_tags(data_path: str, repo: MemoryRepository):
 
 
         # Create Article object.
-        article = Article(
+        article = Movie(
             date=int(data_row[6]),
             title=data_row[1],
             first_para=data_row[3],
-            hyperlink="https://source.unsplash.com/random",
+            hyperlink="https://source.unsplash.com/random/200x100",
             image_hyperlink="https://source.unsplash.com/random/200x100",
             id=article_key,
             director=data_row[4],

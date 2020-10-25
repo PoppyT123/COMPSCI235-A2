@@ -26,5 +26,13 @@ def get_selected_articles(quantity=10):
     return articles
 
 
+def get_all_articles(quantity=10):
+    articles = services.get_random_articles(quantity, repo.repo_instance)
+
+    for article in articles:
+        article['hyperlink'] = url_for('news_bp.articles_by_date', date=article['date'])
+    return articles
+
+
 
 

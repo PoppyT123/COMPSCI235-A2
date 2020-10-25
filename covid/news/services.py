@@ -1,7 +1,8 @@
 from typing import List, Iterable
+import requests
 
 from covid.adapters.repository import AbstractRepository
-from covid.domain.model import make_comment, Article, Comment, Tag
+from covid.domain.model import make_comment, Movie, Comment, Tag, User
 
 
 class NonExistentArticleException(Exception):
@@ -17,10 +18,9 @@ def add_comment(article_id: int, comment_text: str, username: str, repo: Abstrac
     article = repo.get_article(article_id)
     if article is None:
         raise NonExistentArticleException
-
     user = repo.get_user(username)
     if user is None:
-        raise UnknownUserException
+        user = User("Visitor", "Abcd1234")
 
     # Create comment.
     comment = make_comment(comment_text, user, article)
@@ -68,6 +68,18 @@ def get_articles_by_date(date, repo: AbstractRepository):
 
     return articles_dto, prev_date, next_date
 
+def get_articles_by_title(title, repo: AbstractRepository):
+    # Returns articles for the target date (empty if no matches), the date of the previous article (might be null), the date of the next article (might be null)
+
+    articles = repo.get_articles_by_title(target_title=title)
+
+    articles_dto = list()
+
+    if len(articles) > 0:
+        articles_dto = articles_to_dict(articles)
+
+    return articles_dto
+
 
 def get_article_ids_for_tag(tag_name, repo: AbstractRepository):
     article_ids = repo.get_article_ids_for_tag(tag_name)
@@ -97,25 +109,31 @@ def get_comments_for_article(article_id, repo: AbstractRepository):
 # Functions to convert model entities to dicts
 # ============================================
 
-def article_to_dict(article: Article):
+def article_to_dict(article: Movie):
+    movie_dets = requests.get(f"http://omdbapi.com?t={article.title}&apikey=dad2191").text
+    try:
+        image = movie_dets.split('","')[13].split('":"')[1]
+    except:
+        image = "https://source.unsplash.com/random/200x100"
+
+
     article_dict = {
         'id': article.id,
         'date': article.date,
         'title': article.title,
         'first_para': article.first_para,
         'hyperlink': article.hyperlink,
-        'image_hyperlink': article.image_hyperlink,
+        'image_hyperlink': image,
         'comments': comments_to_dict(article.comments),
         'tags': tags_to_dict(article.tags),
-        'director' : article.director,
-        'actors' : article.actors,
-        'runtime' : article.runtime,
-        'rating' : article.rating
+        'runtime': article.runtime,
+        'rating': article.rating,
+        'director': article.director
     }
     return article_dict
 
 
-def articles_to_dict(articles: Iterable[Article]):
+def articles_to_dict(articles: Iterable[Movie]):
     return [article_to_dict(article) for article in articles]
 
 
@@ -150,7 +168,7 @@ def tags_to_dict(tags: Iterable[Tag]):
 # ============================================
 
 def dict_to_article(dict):
-    article = Article(dict.id, dict.date, dict.title, dict.first_para, dict.hyperlink)
+    article = Movie(dict.id, dict.date, dict.title, dict.first_para, dict.hyperlink)
     # Note there's no comments or tags.
     return article
 

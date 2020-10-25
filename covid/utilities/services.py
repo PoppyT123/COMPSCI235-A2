@@ -1,8 +1,9 @@
 from typing import Iterable
 import random
 
+
 from covid.adapters.repository import AbstractRepository
-from covid.domain.model import Article
+from covid.domain.model import Movie
 
 
 def get_tag_names(repo: AbstractRepository):
@@ -30,7 +31,7 @@ def get_random_articles(quantity, repo: AbstractRepository):
 # Functions to convert dicts to model entities
 # ============================================
 
-def article_to_dict(article: Article):
+def article_to_dict(article: Movie):
     article_dict = {
         'date': article.date,
         'title': article.title,
@@ -39,5 +40,5 @@ def article_to_dict(article: Article):
     return article_dict
 
 
-def articles_to_dict(articles: Iterable[Article]):
+def articles_to_dict(articles: Iterable[Movie]):
     return [article_to_dict(article) for article in articles]

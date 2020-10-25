@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 
-from covid.domain.model import User, Article, Tag, Comment, make_comment
+from covid.domain.model import User, Movie, Tag, Comment, make_comment
 from covid.adapters.repository import RepositoryException
 
 
@@ -32,13 +32,17 @@ def test_repository_can_retrieve_article_count(in_memory_repo):
 
 
 def test_repository_can_add_article(in_memory_repo):
-    article = Article(
-        '2014',
+    article = Movie(
+        2014,
         'Guardians of the Galaxy',
         'A group of intergalactic criminals are forced to work together to stop a fanatical warrior from taking control of the universe.',
-        'https://source.unsplash.com/random',
         'https://source.unsplash.com/random/200x100',
-        1
+        'https://source.unsplash.com/random/200x100',
+        1,
+        'James Gunn',
+        '"Chris Pratt, Vin Diesel, Bradley Cooper, Zoe Saldana,',
+        121,
+        8.1
     )
     in_memory_repo.add_article(article)
 
@@ -49,28 +53,29 @@ def test_repository_can_retrieve_article(in_memory_repo):
     article = in_memory_repo.get_article(1)
 
     # Check that the Article has the expected title.
-    assert article.title == 'Coronavirus: First case of virus in New Zealand'
+    assert article.title == 'Guardians of the Galaxy'
 
     # Check that the Article is commented as expected.
-    comment_one = [comment for comment in article.comments if comment.comment == 'Oh no, COVID-19 has hit New Zealand'][
+    comment_one = [comment for comment in article.comments if comment.comment == 'This movie is ok'][
         0]
-    comment_two = [comment for comment in article.comments if comment.comment == 'Yeah Freddie, bad news'][0]
+    comment_two = [comment for comment in article.comments if comment.comment == 'This movie is great'][0]
 
     assert comment_one.user.username == 'fmercury'
     assert comment_two.user.username == "thorke"
 
     # Check that the Article is tagged as expected.
-    assert article.is_tagged_by(Tag('Health'))
-    assert article.is_tagged_by(Tag('New Zealand'))
+    assert article.is_tagged_by(Tag('Action'))
+    assert article.is_tagged_by(Tag('Adventure'))
+    assert article.is_tagged_by(Tag('Sci-fi'))
 
 
 def test_repository_does_not_retrieve_a_non_existent_article(in_memory_repo):
-    article = in_memory_repo.get_article(101)
+    article = in_memory_repo.get_article(1020)
     assert article is None
 
 
 def test_repository_can_retrieve_articles_by_date(in_memory_repo):
-    articles = in_memory_repo.get_articles_by_date(date(2020, 3, 1))
+    articles = in_memory_repo.get_articles_by_date(2014, 3, 1)
 
     # Check that the query returned 3 Articles.
     assert len(articles) == 3
@@ -86,55 +91,51 @@ def test_repository_can_retrieve_tags(in_memory_repo):
 
     assert len(tags) == 4
 
-    tag_one = [tag for tag in tags if tag.tag_name == 'New Zealand'][0]
-    tag_two = [tag for tag in tags if tag.tag_name == 'Health'][0]
-    tag_three = [tag for tag in tags if tag.tag_name == 'World'][0]
-    tag_four = [tag for tag in tags if tag.tag_name == 'Politics'][0]
+    tag_one = [tag for tag in tags if tag.tag_name == 'Action'][0]
+    tag_two = [tag for tag in tags if tag.tag_name == 'Sci-Fi'][0]
 
     assert tag_one.number_of_tagged_articles == 3
     assert tag_two.number_of_tagged_articles == 2
-    assert tag_three.number_of_tagged_articles == 3
-    assert tag_four.number_of_tagged_articles == 1
 
 
 def test_repository_can_get_first_article(in_memory_repo):
     article = in_memory_repo.get_first_article()
-    assert article.title == 'Coronavirus: First case of virus in New Zealand'
+    assert article.title == 'Guardians of the Galaxy'
 
 
 def test_repository_can_get_last_article(in_memory_repo):
     article = in_memory_repo.get_last_article()
-    assert article.title == 'Coronavirus: Death confirmed as six more test positive in NSW'
+    assert article.title == 'The Great Wall'
 
 
 def test_repository_can_get_articles_by_ids(in_memory_repo):
-    articles = in_memory_repo.get_articles_by_id([2, 5, 6])
+    articles = in_memory_repo.get_articles_by_id([1, 2, 3])
 
     assert len(articles) == 3
     assert articles[
-               0].title == 'Covid 19 coronavirus: US deaths double in two days, Trump says quarantine not necessary'
-    assert articles[1].title == "Australia's first coronavirus fatality as man dies in Perth"
-    assert articles[2].title == 'Coronavirus: Death confirmed as six more test positive in NSW'
+               0].title == 'Guardians of the Galaxy'
+    assert articles[1].title == "Prometheus"
+    assert articles[2].title == 'Split'
 
 
 def test_repository_does_not_retrieve_article_for_non_existent_id(in_memory_repo):
-    articles = in_memory_repo.get_articles_by_id([2, 9])
+    articles = in_memory_repo.get_articles_by_id([2, 10])
 
     assert len(articles) == 1
     assert articles[
-               0].title == 'Covid 19 coronavirus: US deaths double in two days, Trump says quarantine not necessary'
+               0].title == 'Prometheus'
 
 
 def test_repository_returns_an_empty_list_for_non_existent_ids(in_memory_repo):
-    articles = in_memory_repo.get_articles_by_id([0, 9])
+    articles = in_memory_repo.get_articles_by_id([0, 10])
 
     assert len(articles) == 0
 
 
 def test_repository_returns_article_ids_for_existing_tag(in_memory_repo):
-    article_ids = in_memory_repo.get_article_ids_for_tag('New Zealand')
+    article_ids = in_memory_repo.get_article_ids_for_tag('Action')
 
-    assert article_ids == [1, 3, 4]
+    assert article_ids == [1, 5, 6]
 
 
 def test_repository_returns_an_empty_list_for_non_existent_tag(in_memory_repo):
@@ -147,7 +148,7 @@ def test_repository_returns_date_of_previous_article(in_memory_repo):
     article = in_memory_repo.get_article(6)
     previous_date = in_memory_repo.get_date_of_previous_article(article)
 
-    assert previous_date.isoformat() == '2020-03-01'
+    assert previous_date == 2016
 
 
 def test_repository_returns_none_when_there_are_no_previous_articles(in_memory_repo):
@@ -161,7 +162,7 @@ def test_repository_returns_date_of_next_article(in_memory_repo):
     article = in_memory_repo.get_article(3)
     next_date = in_memory_repo.get_date_of_next_article(article)
 
-    assert next_date.isoformat() == '2020-03-05'
+    assert next_date == 2016
 
 
 def test_repository_returns_none_when_there_are_no_subsequent_articles(in_memory_repo):
@@ -172,7 +173,7 @@ def test_repository_returns_none_when_there_are_no_subsequent_articles(in_memory
 
 
 def test_repository_can_add_a_tag(in_memory_repo):
-    tag = Tag('Motoring')
+    tag = Tag('Action')
     in_memory_repo.add_tag(tag)
 
     assert tag in in_memory_repo.get_tags()

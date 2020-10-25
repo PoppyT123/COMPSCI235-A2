@@ -36,10 +36,10 @@ class User:
 
 class Comment:
     def __init__(
-            self, user: User, article: 'Article', comment: str, timestamp: datetime
+            self, user: User, article: 'Movie', comment: str, timestamp: datetime
     ):
         self._user: User = user
-        self._article: Article = article
+        self._article: Movie = article
         self._comment: Comment = comment
         self._timestamp: datetime = timestamp
 
@@ -48,7 +48,7 @@ class Comment:
         return self._user
 
     @property
-    def article(self) -> 'Article':
+    def article(self) -> 'Movie':
         return self._article
 
     @property
@@ -65,7 +65,7 @@ class Comment:
         return other._user == self._user and other._article == self._article and other._comment == self._comment and other._timestamp == self._timestamp
 
 
-class Article:
+class Movie:
     def __init__(self, date: int, title: str, first_para: str, hyperlink: str, image_hyperlink: str, id: int = None, director: str = None, actors = None, runtime: int = None, rating: float = None):
         self._id: int = id
         self._date: int = date
@@ -149,10 +149,10 @@ class Article:
         self._tags.append(tag)
 
     def __repr__(self):
-        return f'<Article {self._date} {self._title}>'
+        return f'<Movie {self._date} {self._title}>'
 
     def __eq__(self, other):
-        if not isinstance(other, Article):
+        if not isinstance(other, Movie):
             return False
         return (
                 other._date == self._date and
@@ -171,24 +171,24 @@ class Tag:
             self, tag_name: str
     ):
         self._tag_name: str = tag_name
-        self._tagged_articles: List[Article] = list()
+        self._tagged_articles: List[Movie] = list()
 
     @property
     def tag_name(self) -> str:
         return self._tag_name
 
     @property
-    def tagged_articles(self) -> Iterable[Article]:
+    def tagged_articles(self) -> Iterable[Movie]:
         return iter(self._tagged_articles)
 
     @property
     def number_of_tagged_articles(self) -> int:
         return len(self._tagged_articles)
 
-    def is_applied_to(self, article: Article) -> bool:
+    def is_applied_to(self, article: Movie) -> bool:
         return article in self._tagged_articles
 
-    def add_article(self, article: Article):
+    def add_article(self, article: Movie):
         self._tagged_articles.append(article)
 
     def __eq__(self, other):
@@ -201,7 +201,7 @@ class ModelException(Exception):
     pass
 
 
-def make_comment(comment_text: str, user: User, article: Article, timestamp: datetime = datetime.today()):
+def make_comment(comment_text: str, user: User, article: Movie, timestamp: datetime = datetime.today()):
     comment = Comment(user, article, comment_text, timestamp)
     user.add_comment(comment)
     article.add_comment(comment)
@@ -209,7 +209,7 @@ def make_comment(comment_text: str, user: User, article: Article, timestamp: dat
     return comment
 
 
-def make_tag_association(article: Article, tag: Tag):
+def make_tag_association(article: Movie, tag: Tag):
     if tag.is_applied_to(article):
         raise ModelException(f'Tag {tag.tag_name} already applied to Article "{article.title}"')
 
@@ -303,114 +303,3 @@ class Actor:
             return colleague in self.__colleague_set
 
 
-class Movie:
-    def __init__(self, title: str, release_year: int):
-        if title == "" or type(title) is not str:
-            self.__title = None
-        else:
-            self.__title = title.strip()
-        if release_year < 1900 or type(release_year) is not int:
-            self.__release_year = None
-        else:
-            self.__release_year = release_year
-
-        self.__description = None
-        self.__director = None
-        self.__runtime_minutes = None
-        self.__actors = []
-        self.__genres = []
-
-
-    @property
-    def title(self):
-        return self.__title
-
-    @title.setter
-    def title(self, title):
-        if title == "" or type(title) is not str:
-            self.__title = None
-        else:
-            self.__title = title.strip()
-
-    @property
-    def release_year(self):
-        return self.__release_year
-
-    @release_year.setter
-    def release_year(self, release_year):
-        if release_year < 1900 or type(release_year) != int:
-            self.__release_year = None
-        else:
-            self.__release_year = release_year
-
-    @property
-    def description(self):
-        return self.__description
-
-    @description.setter
-    def description(self, description: str):
-        if type(description) == str:
-            self.__description = description.strip()
-
-    @property
-    def director(self):
-        return self.__director
-
-    @director.setter
-    def director(self, director):
-        if isinstance(director, Director):
-            self.__director = director
-
-    @property
-    def actors(self):
-        return self.__actors
-
-    @property
-    def genres(self):
-        return self.__genres
-
-    @property
-    def runtime_minutes(self):
-        return self.__runtime_minutes
-
-    @runtime_minutes.setter
-    def runtime_minutes(self, time):
-        if type(time) == int and time > 0:
-            self.__runtime_minutes = time
-        else:
-            raise ValueError
-
-    def __repr__(self):
-        return f"<Movie {self.__title}, {self.__release_year}>"
-
-    def __eq__(self, other):
-        if isinstance(other, Movie) and (self.__title, self.__release_year) == (other.__title, other.__release_year):
-            return True
-        return False
-
-    def __lt__(self, other):
-        if isinstance(other, Movie):
-            if self.__title != other.__title:
-                return self.__title < other.__title
-            else:
-                return self.__release_year < other.__release_year
-
-    def __hash__(self):
-        movie_year = self.__title + str(self.__release_year)
-        return hash(movie_year)
-
-    def add_actor(self, actor):
-        if isinstance(actor, Actor) and actor not in self.__actors:
-            self.__actors.append(actor)
-
-    def remove_actor(self, actor):
-        if actor in self.__actors and isinstance(actor, Actor):
-            self.__actors.remove(actor)
-
-    def add_genre(self, genre):
-        if isinstance(genre, Genre) and genre not in self.__genres:
-            self.__genres.append(genre)
-
-    def remove_genre(self, genre):
-        if genre in self.__genres and isinstance(genre, Genre):
-            self.__genres.remove(genre)

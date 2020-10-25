@@ -43,11 +43,6 @@
         <p>{{article.first_para}}</p>
         <p>Rating: {{article.rating}}</p>
         <p>Runtime: {{article.runtime}} minutes</p>
-        <div style="float:left">
-            {% for actor in article.actors %}
-            <p> {{ actor }} </p>
-            {% endfor %}
-        </div>
         <p>Director: {{article.director}}</p>
         <div style="float:left">
             {% for tag in article.tags %}
@@ -58,7 +53,7 @@
             {% if article.comments|length > 0 and article.id != show_comments_for_article %}
                 <button class="btn-general" onclick="location.href='{{ article.view_comment_url }}'">{{ article.comments|length }} comments</button>
             {% endif %}
-            <button class="btn-general" onclick="location.href='{{ article.add_comment_url }}'">Comment</button>
+            <button class="btn-general" onclick="location.href='{{ article.add_comment_url }}'">Review</button>
         </div>
         {% if article.id == show_comments_for_article %}
         <div style="clear:both">

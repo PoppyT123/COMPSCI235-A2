@@ -73,8 +73,8 @@ def articles_by_date():
         # Generate the webpage to display the articles.
         return render_template(
             'news/articles.html',
-            title='Movies',
-            articles_title=tag_name + " Movies",
+            title='Articles',
+            articles_title=target_date.strftime('%A %B %e %Y'),
             articles=articles,
             selected_articles=utilities.get_selected_articles(len(articles) * 2),
             tag_urls=utilities.get_tags_and_urls(),
@@ -89,9 +89,28 @@ def articles_by_date():
     return redirect(url_for('home_bp.home'))
 
 
+@news_blueprint.route('/browse/search', methods=['GET'])
+def articles_by_title(title=""):
+    target_title = title
+
+    articles = services.get_articles_by_title(target_title, repo.repo_instance)
+
+
+    return render_template(
+        'news/articles.html',
+        title='Articles',
+        articles_title='Results for key word: ' + target_title,
+        articles=articles,
+        selected_articles=utilities.get_selected_articles(len(articles) * 2),
+        tag_urls=utilities.get_tags_and_urls(),
+        )
+
+    # No articles to show, so return the homepage.
+    return redirect(url_for('home_bp.home'))
+
 @news_blueprint.route('/articles_by_tag', methods=['GET'])
 def articles_by_tag():
-    articles_per_page = 10
+    articles_per_page = 3
 
     # Read query parameters.
     tag_name = request.args.get('tag')
@@ -145,7 +164,7 @@ def articles_by_tag():
     # Generate the webpage to display the articles.
     return render_template(
         'news/articles.html',
-        title='Movies',
+        title='Articles',
         articles_title=tag_name + ' Movies',
         articles=articles,
         selected_articles=utilities.get_selected_articles(len(articles) * 2),
@@ -201,7 +220,7 @@ def comment_on_article():
     article = services.get_article(article_id, repo.repo_instance)
     return render_template(
         'news/comment_on_article.html',
-        title='Edit Movie Review',
+        title='Edit Movie',
         article=article,
         form=form,
         handler_url=url_for('news_bp.comment_on_article'),
@@ -222,9 +241,9 @@ class ProfanityFree:
 
 
 class CommentForm(FlaskForm):
-    comment = TextAreaField('Review', [
+    comment = TextAreaField('Comment', [
         DataRequired(),
-        Length(min=4, message='Your review is too short'),
-        ProfanityFree(message='Your review must not contain profanity')])
-    article_id = HiddenField("Movie id")
+        Length(min=4, message='Your comment is too short'),
+        ProfanityFree(message='Your comment must not contain profanity')])
+    article_id = HiddenField("Article id")
     submit = SubmitField('Submit')

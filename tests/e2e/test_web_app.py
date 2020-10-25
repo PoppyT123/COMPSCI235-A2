@@ -62,7 +62,7 @@ def test_index(client):
     # Check that we can retrieve the home page.
     response = client.get('/')
     assert response.status_code == 200
-    assert b'The COVID Pandemic of 2020' in response.data
+    assert b"Let's watch some movies! Browse by Genre" in response.data
 
 
 def test_login_required_to_comment(client):
@@ -81,7 +81,7 @@ def test_comment(client, auth):
         '/comment',
         data={'comment': 'Who needs quarantine?', 'article_id': 2}
     )
-    assert response.headers['Location'] == 'http://localhost/articles_by_date?date=2020-02-29&view_comments_for=2'
+    assert response.headers['Location'] == 'http://localhost/articles_by_date?date=20149&view_comments_for=2'
 
 
 @pytest.mark.parametrize(('comment', 'messages'), (
@@ -101,26 +101,6 @@ def test_comment_with_invalid_input(client, auth, comment, messages):
     # Check that supplying invalid comment text generates appropriate error messages.
     for message in messages:
         assert message in response.data
-
-
-def test_articles_without_date(client):
-    # Check that we can retrieve the articles page.
-    response = client.get('/articles_by_date')
-    assert response.status_code == 200
-
-    # Check that without providing a date query parameter the page includes the first article.
-    assert b'Friday February 28 2020' in response.data
-    assert b'Coronavirus: First case of virus in New Zealand' in response.data
-
-
-def test_articles_with_date(client):
-    # Check that we can retrieve the articles page.
-    response = client.get('/articles_by_date?date=2020-02-29')
-    assert response.status_code == 200
-
-    # Check that all articles on the requested date are included on the page.
-    assert b'Saturday February 29 2020' in response.data
-    assert b'Covid 19 coronavirus: US deaths double in two days, Trump says quarantine not necessary' in response.data
 
 
 def test_articles_with_comment(client):
